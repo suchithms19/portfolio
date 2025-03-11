@@ -25,7 +25,7 @@ A retro-themed interactive resume website inspired by classic hacker terminals f
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/suchithms/portfolio.git
+   git clone https://github.com/suchithms19/portfolio.git
    cd portfolio
    ```
 
