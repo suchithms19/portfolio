@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Terminal, Code, User, Github, Mail, Linkedin, Award, Rocket } from 'lucide-react';
 import MatrixRain from '../effects/MatrixRain';
 import LoadingScreen from '../loading/LoadingScreen';
+import CRTEffect from '../effects/CRTEffect';
+import GlitchText from '../effects/GlitchText';
+import TypewriterText from '../effects/TypewriterText';
 import WelcomeSection from './WelcomeSection';
 import SkillsSection from './SkillsSection';
 import ExperienceSection from './ExperienceSection';
@@ -57,69 +60,75 @@ const HackerResume = () => {
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
       <MatrixRain />
+      <CRTEffect />
       
       <div className="container mx-auto p-4 md:p-8 relative z-10">
-        <div className="border border-green-500 rounded-lg p-4 md:p-6 bg-black bg-opacity-90">
+        <div className="border border-green-500 rounded-lg p-4 md:p-6 bg-black bg-opacity-90 shadow-[0_0_15px_rgba(0,255,0,0.3)]">
           <div className="flex items-center space-x-2 mb-4">
-            <Terminal size={20} />
-            <span className="text-sm">terminal@suchith</span>
+            <Terminal size={20} className="animate-pulse" />
+            <GlitchText text="terminal@suchith" className="text-sm" />
           </div>
           
           <div className="flex flex-wrap gap-4 mb-6">
-            <button
-              onClick={() => handleSectionChange('welcome')}
-              className={`flex items-center space-x-2 px-4 py-2 border rounded transition-colors duration-300 ${
-                section === 'welcome' ? 'bg-green-500 text-black border-black' : 'border-green-500 hover:bg-green-500 hover:text-black'
-              }`}
-            >
-              <User size={16} />
-              <span>Profile</span>
-            </button>
-
-            <button
-              onClick={() => handleSectionChange('skills')}
-              className={`flex items-center space-x-2 px-4 py-2 border rounded transition-colors duration-300 ${
-                section === 'skills' ? 'bg-green-500 text-black border-black' : 'border-green-500 hover:bg-green-500 hover:text-black'
-              }`}
-            >
-              <Code size={16} />
-              <span>Skills</span>
-            </button>
-            <button
-              onClick={() => handleSectionChange('experience')}
-              className={`flex items-center space-x-2 px-4 py-2 border rounded transition-colors duration-300 ${
-                section === 'experience' ? 'bg-green-500 text-black border-black' : 'border-green-500 hover:bg-green-500 hover:text-black'
-              }`}
-            >
-              <Award size={16} />
-              <span>Experience</span>
-            </button>
-            <button
-              onClick={() => handleSectionChange('startup')}
-              className={`flex items-center space-x-2 px-4 py-2 border rounded transition-colors duration-300 ${
-                section === 'startup' ? 'bg-green-500 text-black border-black' : 'border-green-500 hover:bg-green-500 hover:text-black'
-              }`}
-            >
-              <Rocket size={16} />
-              <span>Projects</span>
-            </button>
+            {[
+              { id: 'welcome', icon: User, text: 'Profile' },
+              { id: 'skills', icon: Code, text: 'Skills' },
+              { id: 'experience', icon: Award, text: 'Experience' },
+              { id: 'startup', icon: Rocket, text: 'Projects' }
+            ].map(({ id, icon: Icon, text }) => (
+              <button
+                key={id}
+                onClick={() => handleSectionChange(id)}
+                className={`flex items-center space-x-2 px-4 py-2 border rounded transition-all duration-300 hover:shadow-[0_0_10px_rgba(0,255,0,0.5)] ${
+                  section === id
+                    ? 'bg-green-500 text-black border-black shadow-[0_0_15px_rgba(0,255,0,0.7)]'
+                    : 'border-green-500 hover:bg-green-500/20'
+                }`}
+              >
+                <Icon size={16} className={section === id ? 'animate-pulse' : ''} />
+                <GlitchText text={text} className={section === id ? 'text-black' : ''} />
+              </button>
+            ))}
           </div>
           
-          <div className={`min-h-[400px] transition-opacity duration-500 ${transitioning ? 'opacity-0' : 'opacity-100'}`}>
-            {renderSection()}
-            <span className={`inline-block w-3 mt-3 h-6 ${showCursor ? 'bg-green-400' : 'bg-transparent'}`} />
+          <div className={`min-h-[400px] transition-all duration-500 ${
+            transitioning
+              ? 'opacity-0 transform translate-y-4'
+              : 'opacity-100 transform translate-y-0'
+          }`}>
+            <div className="glitch-container relative">
+              <TypewriterText
+                text={section === 'welcome' ? '> Initializing profile...\n\n' :
+                      section === 'skills' ? '> Loading skillset...\n\n' :
+                      section === 'experience' ? '> Accessing experience records...\n\n' :
+                      '> Loading project data...\n\n'}
+                speed={30}
+              />
+              {renderSection()}
+            </div>
           </div>
           
-          <div className="mt-8 flex space-x-4">
-            <a href={`mailto:${resumeData.email}`} className="hover:text-green-300">
-              <Mail size={20} />
-            </a>
-            <a href={resumeData.github} target="_blank" rel="noopener noreferrer" className="hover:text-green-300">
-              <Github size={20} />
-            </a>
-            <a href={resumeData.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-green-300">
-              <Linkedin size={20} />
-            </a>
+          <div className="mt-8 flex space-x-6 justify-center">
+            {[
+              { href: `mailto:${resumeData.email}`, Icon: Mail, label: 'Email' },
+              { href: resumeData.github, Icon: Github, label: 'GitHub' },
+              { href: resumeData.linkedin, Icon: Linkedin, label: 'LinkedIn' }
+            ].map(({ href, Icon, label }) => (
+              <a
+                key={label}
+                href={href}
+                target={href.startsWith('mailto') ? undefined : '_blank'}
+                rel="noopener noreferrer"
+                className="group relative hover:text-green-300 transition-colors duration-300"
+                onMouseEnter={() => setShowCursor(false)}
+                onMouseLeave={() => setShowCursor(true)}
+              >
+                <Icon size={20} className="transform group-hover:scale-110 transition-transform duration-300" />
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <GlitchText text={label} className="text-xs" />
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </div>
